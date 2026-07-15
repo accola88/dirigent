@@ -13,6 +13,11 @@ mkdir -p "$CMD_DEST"
 for f in "$ROOT/commands"/*.md; do
   cp -v "$f" "$CMD_DEST/"
 done
+WF_DEST="${HOME}/.claude/workflows"
+mkdir -p "$WF_DEST"
+for f in "$ROOT/workflows"/*.js; do
+  cp -v "$f" "$WF_DEST/"
+done
 echo
 echo "Done. Start: claude --agent fab   |   claude --agent ops"
 echo "Mid-session activation: /dirigent"

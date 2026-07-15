@@ -124,6 +124,54 @@ via `model` overrides (row 2 of the table) is dirigent's arbitrage idea in
 workflow form, and was the best measured multi-agent arm. ultracode in its
 default (agents inherit the session model) was the most expensive one.
 
+### Shipped recipe: `fanout-analysis` (the measured winner, ready to use)
+
+The winning arm from the table ships with dirigent as a reusable workflow:
+[`workflows/fanout-analysis.js`](workflows/fanout-analysis.js) — N parallel
+Sonnet readers → one Sonnet synthesizer → one adversarial Sonnet verifier
+that re-opens the cited lines. `install.sh` copies it to
+`~/.claude/workflows/`; alternatively place it in a project's
+`.claude/workflows/`.
+
+**Invoke it** from any Claude Code session by asking for it by name — the
+word "ultracode" in your message (or an explicit "run a workflow") opts the
+session into multi-agent orchestration:
+
+```text
+ultracode: run the fanout-analysis workflow on this repo —
+root /abs/path/to/repo, files src/a.py src/b.py src/c.py src/d.py,
+task "error handling and encoding robustness"
+```
+
+Claude then calls the Workflow tool with
+`{name: "fanout-analysis", args: {root, files: [...], task}}`. The report
+comes back as text (workflow subagents are not allowed to write report
+files — the session persists it), followed by the verifier's
+`Verdict: n/6 correct` line.
+
+Note: like agents and hooks, saved workflows are loaded at **session
+start** — after installing, the name resolves in new sessions only. In an
+already-running session, point Claude at the script file instead ("run the
+workflow script at `…/workflows/fanout-analysis.js` with args …"); the
+Workflow tool accepts a `scriptPath` directly.
+
+**How the trick works — and how to build your own:** the entire cost
+advantage is one option on each `agent()` call in the script:
+
+```js
+const OPTS = { model: 'sonnet', effort: 'high' }   // dirigent's arbitrage idea
+agent(prompt, { ...OPTS, label: 'read:...' })
+```
+
+Without it, workflow agents inherit the session model — run the same script
+from a Fable session and you get the most expensive row of the table
+instead of the second-cheapest. Use `haiku` for pure scanning stages and
+keep `sonnet·high` for judgment stages; that mirrors dirigent's role
+routing (`scout` vs. `judge`) inside a workflow. Reserve this recipe for
+tasks that actually split into independent parts — single reasoning chains
+(an unknown bug, one architecture decision) stay solo, exactly as Rule 0
+says.
+
 ## Where the advantages are — and where they aren't
 
 **Advantages (evidenced):**
