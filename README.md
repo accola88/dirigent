@@ -31,10 +31,15 @@ file-based Requirements Ledger that survives context compaction, and hooks
 that mechanically secure exactly the two points that get skipped under
 pressure (delegation without a spec, closing with open items).
 
-dirigent is **not an automatic cost saver**. Measured: for tasks that fit
-comfortably in one context, full orchestration is more expensive and slower
-than a solo session — at equal quality. The strengths lie elsewhere (see
-"Where the advantages are — and where they aren't").
+dirigent is **not an automatic cost saver, and the chair is not the tool
+for cheap parallel work**. Measured: for tasks that fit comfortably in one
+context, a chair orchestrates (ledger, waves, verification) and comes out
+more expensive and slower than a solo session — at equal quality. That is
+what a chair *does*; prompt-level nudges (Rule 0) reduce the ceremony but
+do not stop it (see "Does Rule 0 change chair behavior?"). If you want the
+cost win from cheap workers, use the shipped `fanout-analysis` workflow,
+not a chair. The chair's value is discipline and verification, not price
+(see "Where the advantages are — and where they aren't").
 
 ## Usage
 
@@ -115,6 +120,17 @@ correct):
 
 Small task (3 files): ops chair solo $0.78 beats Fable solo $1.28 —
 Opus tokens officially cost half of Fable.
+
+### Does Rule 0 change chair behavior?
+
+v0.2.0 rewrote Rule 0 to push medium in-context tasks toward solo work or a
+single dispatch spawn. Re-running the medium task on the new ops chair
+(B5): it still built a ledger and orchestrated, just with **2 worker spawns
+instead of 3 + verify** — $3.10 vs. $3.62 (−14%), 18 vs. 19 min. So the
+prompt nudge is real but weak; a chair orchestrates because that is what it
+is for. The honest takeaway drives the positioning here: **do not run a
+chair to save money on in-context work — run solo, or the workflow.** Use
+the chair for what only it does (below).
 
 **Placing ultracode:** ultracode/workflows are a *task tool* (a
 deterministic script orchestrates an agent swarm per job); dirigent is a
@@ -219,12 +235,18 @@ says.
 dirigent solves a real problem — but a different one than its tagline
 suggests. The frugality thesis ("chair + cheap workers < big model
 everywhere") measurably does **not** hold for tasks that fit in one
-context; solo wins there. What remains and carries: model arbitrage as a
-principle (it also won as a workflow variant), the reliability layer
-(sec lane, verification, guards), and session persistence. Run dirigent as
-the default for everything and you pay extra; use it deliberately
-(security, critical closes, long projects, small tasks on ops) and you get
-properties available nowhere else as a package.
+context; solo wins there, and a chair can't be prompted out of
+orchestrating (B5 confirmed the v0.2.0 Rule 0 rewrite only trims the
+ceremony, it doesn't remove it). So the split is clean: **the chair is for
+discipline and verification, the `fanout-analysis` workflow is for cheap
+parallel volume, and solo is for everything small that fits in a context.**
+What carries dirigent: model arbitrage as a principle (it won as the
+workflow variant, which is now shipped), the reliability layer (sec lane,
+verification, guards), and session persistence. Run a chair as the default
+for everything and you pay extra; use each piece deliberately (security and
+critical closes → chair; parallel analysis → workflow; long multi-session
+projects → the ledger) and you get properties available nowhere else as a
+package.
 
 In the ecosystem (research 07/2026): exactly one public project covers the
 same combination — Rylaa/fable5-orchestrator, dirigent's direct template
