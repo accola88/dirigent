@@ -1,0 +1,11 @@
+{
+  "name": "dirigent",
+  "owner": { "name": "Val" },
+  "plugins": [
+    {
+      "name": "dirigent",
+      "source": "./",
+      "description": "Optional two-config orchestrator (fab/ops chairs, tiered worker roles, ledger guard hooks)."
+    }
+  ]
+}

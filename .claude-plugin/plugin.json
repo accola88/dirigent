@@ -1,0 +1,6 @@
+{
+  "name": "dirigent",
+  "description": "Optional two-config orchestrator for Claude Code. Chairs: fab (Fable 5) and ops (Opus 4.8) plan and decide; named worker roles (scout/mech/coder/judge on Haiku/Sonnet) carry the volume; esc/sec/check/check-max form the escalation and verification valve. Guard hooks enforce Requirements-Ledger discipline mechanically — and stay silent outside dirigent sessions.",
+  "version": "0.2.0",
+  "author": { "name": "Val" }
+}
