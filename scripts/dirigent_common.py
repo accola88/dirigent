@@ -11,12 +11,20 @@ CHAIRS = {"fab", "ops"}
 
 
 def read_payload() -> dict:
-    """Hook input arrives as JSON on stdin; never crash on bad input."""
+    """Hook input arrives as JSON on stdin; never crash on bad input.
+    Guarantees a dict — valid JSON of any other shape counts as empty."""
     try:
         raw = sys.stdin.read()
-        return json.loads(raw) if raw.strip() else {}
+        data = json.loads(raw) if raw.strip() else {}
+        return data if isinstance(data, dict) else {}
     except Exception:
         return {}
+
+
+def tool_input_dict(payload: dict) -> dict:
+    """tool_input is model-shaped input: only trust it if it is a dict."""
+    ti = payload.get("tool_input")
+    return ti if isinstance(ti, dict) else {}
 
 
 def state_dir() -> Path:
@@ -44,7 +52,7 @@ def save_marker(session_id: str, data: dict) -> None:
     try:
         marker_path(session_id).write_text(json.dumps(data))
     except Exception:
-        pass
+        metric("marker_write_failed")  # silent state loss should be observable
 
 
 def repo_root(start: Path) -> Path:

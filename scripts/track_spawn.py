@@ -14,7 +14,8 @@ Summary: python3 scripts/stats.py
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from dirigent_common import read_payload, guards_enabled, delegation_chars, metric
+from dirigent_common import (read_payload, guards_enabled, delegation_chars,
+                             tool_input_dict, metric)
 
 TRACKED_TOOLS = {"Agent", "Task", "Workflow"}
 KNOWN_ROLES = {"scout", "mech", "coder", "judge", "esc", "sec",
@@ -38,7 +39,7 @@ def main() -> int:
     if not guards_enabled(payload):
         return 0
 
-    ti = payload.get("tool_input") or {}
+    ti = tool_input_dict(payload)
     resp = payload.get("tool_response")
     role = str(ti.get("subagent_type") or "").strip() or "(default)"
 

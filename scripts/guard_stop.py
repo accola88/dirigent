@@ -31,14 +31,14 @@ def main() -> int:
         return 0
 
     sid = payload.get("session_id", "")
-    marker = load_marker(sid)
+    marker = load_marker(sid) if sid else {}  # no identity → no shared state
     started = marker.get("started")
     try:
         if started is not None and ledger.stat().st_mtime < float(started) - 5.0:
             metric("stop_pass", reason="foreign_ledger")
             return 0  # untouched by this session — another task's ledger
-    except OSError:
-        pass
+    except (OSError, ValueError, TypeError):
+        pass  # unreadable ledger stat or corrupted marker — treat as ours
 
     once = os.environ.get("DIRIGENT_STOP_MODE", "once-per-session") != "every-turn"
     reminded = marker.get("reminded_ledgers") or []
@@ -46,8 +46,9 @@ def main() -> int:
         metric("stop_pass", reason="already_reminded")
         return 0
 
-    marker["reminded_ledgers"] = reminded + [str(ledger)]
-    save_marker(sid, marker)
+    if sid:
+        marker["reminded_ledgers"] = reminded + [str(ledger)]
+        save_marker(sid, marker)
     metric("stop_block", open_items=len(state["open"]))
 
     items = "\n".join(f"  - [ ] {it}" for it in state["open"][:20])

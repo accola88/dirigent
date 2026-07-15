@@ -12,7 +12,7 @@ import os, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dirigent_common import (read_payload, guards_enabled, find_ledger,
-                             delegation_chars, metric, CHAIRS)
+                             delegation_chars, tool_input_dict, metric, CHAIRS)
 
 GUARDED_TOOLS = {"Agent", "Task", "Workflow"}
 
@@ -24,10 +24,10 @@ def main() -> int:
     if not guards_enabled(payload):
         return 0
 
-    ti = payload.get("tool_input") or {}
+    ti = tool_input_dict(payload)
 
-    sub = str(ti.get("subagent_type") or "")
-    if sub.split(":")[-1] in CHAIRS:
+    sub = str(ti.get("subagent_type") or "").strip()
+    if sub.split(":")[-1].strip().lower() in CHAIRS:
         metric("spawn_deny", reason="chair")
         sys.stderr.write(
             f"dirigent spawn guard: '{sub}' is a session chair, not a "
@@ -46,7 +46,7 @@ def main() -> int:
     if chars <= threshold:
         metric("spawn_pass", reason="short", chars=chars)
         return 0
-    if sub == "fork":
+    if sub.lower() == "fork":
         metric("spawn_pass", reason="fork", chars=chars)
         return 0
     if find_ledger(payload) is not None:

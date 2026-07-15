@@ -265,7 +265,7 @@ from the outside.
 ## Tests
 
 ```bash
-python3 -m pytest tests/ -q     # 44 tests: opt-in gate, guards+tracker e2e, role/script/command lint
+python3 -m pytest tests/ -q     # 48 tests: opt-in gate, guards+tracker e2e, robustness edges, role/script/command lint
 ```
 
 ## Design sources & related projects
